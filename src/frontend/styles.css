@@ -1,0 +1,36 @@
+* {
+    background-color: rgb(43, 42, 51);
+    color: rgb(249, 249, 250);
+}
+header {
+    align-items: center;
+    justify-content: center;
+}
+
+hr {
+    size: 5px
+
+}
+header h1 {
+    text-align: center;
+    text-decoration: none;
+}
+
+p {
+    text-align: center;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: large;
+    width: 50%;
+    margin: auto;
+}
+
+
+img {
+    display:block;
+    opacity: 1;
+    margin:auto;
+    border-radius: 80px;
+    width: 50%;
+    max-width: 100%;
+    min-width: none;
+}

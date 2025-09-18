@@ -1,0 +1,18 @@
+{
+    "files.associations": {
+        "string": "cpp"
+    },
+    "cmake.sourceDirectory": "/media/loruto/lrdsk/MPEI/Website/poker_cursach/src/userver/final",
+    "C_Cpp.default.compileCommands": [
+        "/media/loruto/lrdsk/MPEI/Website/poker_cursach/build/compile_сommands.json"
+    ],
+    "C_Cpp.default.includePath": [
+        "/usr/include/userver"
+    ],
+    "C_Cpp.default.cppStandard": "c++20",
+    "C_Cpp.default.defines": [
+        "USERVER_NAMESPACE=userver",
+        "USERVER_NAMESPACE_BEGIN=namespace userver { inline namespace v2_ { ", 
+        "USERVER_NAMESPACE_END=} }"
+    ]
+}
