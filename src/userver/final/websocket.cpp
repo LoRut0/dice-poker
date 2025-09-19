@@ -1,24 +1,28 @@
-#include <userver/components/minimal_server_component_list.hpp>
-#include <userver/server/handlers/exceptions.hpp>
-#include <userver/server/websocket/websocket_handler.hpp>
-
+#include "websocket.hpp"
 #include <string_view>
+
 
 #define MAX_SEQ 20
 
-using namespace userver;
+inline constexpr std::string_view OngoingCreateTable = R"~(
+    CREATE TABLE IF NOT EXISTS ongoing (
+    key INTEGER PRIMARY KEY,
+    )
+)~";
 
-namespace samples::websocket {
+namespace services::websocket {
+    
+    WebsocketsHandler::WebsocketsHandler(const components::ComponentConfig& config, const components::ComponentContext& context) 
+        : server::websocket::WebsocketHandlerBase(config, context),
+          sqlite_client_(context.FindComponent<components::SQLite>("database").GetClient()),
+          redis_client_{context.FindComponent<components::Redis>("key-json-database").GetClient("key-json")},
+          redis_cc_{std::chrono::seconds{15}, std::chrono::seconds{60}, 4} 
+    {
 
-class WebsocketsHandler final : public server::websocket::WebsocketHandlerBase {
-public:
-    // `kName` is used as the component name in static config
-    static constexpr std::string_view kName = "websocket-handler";
-
-    // Component is valid after construction and is able to accept requests
-    using WebsocketHandlerBase::WebsocketHandlerBase;
-
-    void Handle(server::websocket::WebSocketConnection& chat, server::request::RequestContext&) const override {
+        sqlite_client_->Execute(storages::sqlite::OperationType::kReadWrite, OngoingCreateTable.data());
+     }
+    
+    void WebsocketsHandler::Handle(server::websocket::WebSocketConnection& chat, server::request::RequestContext&) const {
         server::websocket::Message message;
         while (!engine::current_task::ShouldCancel()) {
             chat.Recv(message);               // throws on closed/dropped connection
@@ -28,25 +32,6 @@ public:
         }
         if (message.close_status) chat.Close(*message.close_status);
     }
-private:
-    /*
-     * @brief Parses message from websocket, calls functions
-     *
-     * @throws {server::handlers::ClientError} if format of msg is bad
-     */
-    void ParseMessage(server::websocket::Message &message) const;
-    /*
-     * @brief checks if Json Format corresponds with expected
-     *
-     * @returns {0 | 1 | 2} 0-roll, 1-choose, 2-start
-     * @returns {-1} If format is bad
-     */
-    int JsonFormatCheck(formats::json::Value &msg) const;
-};
-
-}
-
-namespace samples::websocket {
 
     int WebsocketsHandler::JsonFormatCheck(formats::json::Value &msg) const {
         std::string action;
@@ -69,9 +54,72 @@ namespace samples::websocket {
         }
         formats::json::Value json_msg{formats::json::FromString(std::string_view(message.data))};
         switch(JsonFormatCheck(json_msg)) {
-
+            case 2: {
+                formats::json::ValueBuilder json_for_redis;
+                int64_t gameID = sqlNewOngoing();
+                DefaultInit(json_for_redis, gameID);
+                
+            }
+            case 0: {
+                //TODO: some
+            }
         }
 
     }
 
+    void WebsocketsHandler::DefaultInit(formats::json::ValueBuilder &json_for_redis, int64_t gameID) const {
+        json_for_redis["gameID"] = gameID;
+        //TODO: random queue at the beginning of game
+        json_for_redis["state"]["playerq"] = 0;
+
+        //p1
+        json_for_redis["state"]["p1"]["dices"].Resize(5);
+        for (int i = 0; i < 5; i++) {
+            json_for_redis["state"]["p1"]["dices"][i] = -1;
+        }
+        json_for_redis["state"]["p1"]["rollnum"] = 0;
+        json_for_redis["state"]["p1"]["sequences"]["s1"] = 0;
+        json_for_redis["state"]["p1"]["sequences"]["s2"] = 0;
+        json_for_redis["state"]["p1"]["sequences"]["s3"] = 0;
+        json_for_redis["state"]["p1"]["sequences"]["s4"] = 0;
+        json_for_redis["state"]["p1"]["sequences"]["s5"] = 0;
+        json_for_redis["state"]["p1"]["sequences"]["s6"] = 0;
+        json_for_redis["state"]["p1"]["sequences"]["pair"] = 0;
+        json_for_redis["state"]["p1"]["sequences"]["twopair"] = 0;
+        json_for_redis["state"]["p1"]["sequences"]["bonus1"] = 0;
+        json_for_redis["state"]["p1"]["sequences"]["3kind"] = 0;
+        json_for_redis["state"]["p1"]["sequences"]["4kind"] = 0;
+        json_for_redis["state"]["p1"]["sequences"]["fullhouse"] = 0;
+        json_for_redis["state"]["p1"]["sequences"]["smstrght"] = 0;
+        json_for_redis["state"]["p1"]["sequences"]["lrgstrght"] = 0;
+        json_for_redis["state"]["p1"]["sequences"]["5kind"] = 0;
+        json_for_redis["state"]["p1"]["sequences"]["chance"] = 0;
+
+        //p2
+        json_for_redis["state"]["p2"]["dices"].Resize(5);
+        for (int i = 0; i < 5; i++) {
+            json_for_redis["state"]["p2"]["dices"][i] = -1;
+        }
+        json_for_redis["state"]["p2"]["rollnum"] = 0;
+        json_for_redis["state"]["p2"]["sequences"]["s1"] = 0;
+        json_for_redis["state"]["p2"]["sequences"]["s2"] = 0;
+        json_for_redis["state"]["p2"]["sequences"]["s3"] = 0;
+        json_for_redis["state"]["p2"]["sequences"]["s4"] = 0;
+        json_for_redis["state"]["p2"]["sequences"]["s5"] = 0;
+        json_for_redis["state"]["p2"]["sequences"]["s6"] = 0;
+        json_for_redis["state"]["p2"]["sequences"]["pair"] = 0;
+        json_for_redis["state"]["p2"]["sequences"]["twopair"] = 0;
+        json_for_redis["state"]["p2"]["sequences"]["bonus1"] = 0;
+        json_for_redis["state"]["p2"]["sequences"]["3kind"] = 0;
+        json_for_redis["state"]["p2"]["sequences"]["4kind"] = 0;
+        json_for_redis["state"]["p2"]["sequences"]["fullhouse"] = 0;
+        json_for_redis["state"]["p2"]["sequences"]["smstrght"] = 0;
+        json_for_redis["state"]["p2"]["sequences"]["lrgstrght"] = 0;
+        json_for_redis["state"]["p2"]["sequences"]["5kind"] = 0;
+        json_for_redis["state"]["p2"]["sequences"]["chance"] = 0;
+        
+        return;
+    }
+
 }
+

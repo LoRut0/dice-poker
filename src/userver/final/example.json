@@ -13,9 +13,9 @@
 },
 "Game":
 {
-    "game-id": 123,
+    "gameID": 123,
     "state": {
-        "player-q": 0,
+        "playerq": 0,
         "p1": {
             "dices": [
                 1,
@@ -24,7 +24,7 @@
                 4,
                 5
             ],
-            "roll-num": 0,
+            "rollnum": 0,
             "sequences": {
                 "s1": 0,
                 "s2": 0,
@@ -32,12 +32,14 @@
                 "s4": 0,
                 "s5": 0,
                 "s6": 0,
+                "pair": 0,
+                "twopair": 0,
                 "bonus1": 0,
                 "3kind": 0,
                 "4kind": 0,
                 "fullhouse": 0,
-                "smstraight": 0,
-                "lrgstraight": 0,
+                "smstrght": 0,
+                "lrgstrght": 0,
                 "5kind": 0,
                 "chance": 0
             }
@@ -50,7 +52,7 @@
                 4,
                 5
             ],
-            "roll-num": 0,
+            "rollnum": 0,
             "sequences": {
                 "s1": 0,
                 "s2": 0,
@@ -58,12 +60,14 @@
                 "s4": 0,
                 "s5": 0,
                 "s6": 0,
+                "pair": 0,
+                "twopair": 0,
                 "bonus1": 0,
                 "3kind": 0,
                 "4kind": 0,
                 "fullhouse": 0,
-                "smstraight": 0,
-                "lrgstraight": 0,
+                "smstrght": 0,
+                "lrgstrght": 0,
                 "5kind": 0,
                 "chance": 0
             }
